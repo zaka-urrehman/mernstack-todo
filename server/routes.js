@@ -19,7 +19,7 @@ router.get('/todos', async (req, res) => {
 
 // POST  /todos
 router.post('/todos', async (req, res) => {
-    const collection = getCollection()
+    const collection = getCollection()    
     const { todo } = req.body
     const newTodo = await collection.insertOne({ todo, status: false })
     res.status(200).json({ todo, status: false, _id: newTodo.insertedId })
@@ -49,16 +49,17 @@ router.put('/todos/:id', async (req, res) => {
     try {
         const todo = await collection.findOne({_id})
         if(!todo){
-            return res.status(404).json({error:`Todo with id ${_id} not found`})
+             return res.status(404).json({error:`Todo with id ${_id} not found`}) // Return to prevent further execution
         }
         const newStatus = !todo.status
         const updateResult = await collection.updateOne({ _id }, { $set: { status: newStatus } })
         if(updateResult.modifiedCount === 1){
-            res.status(200).json({message:"successfully updated todo"})
+            return res.status(200).json({message:"successfully updated todo"}) // Return to prevent further execution
         }
-        return res.status(500).json({error:"Failed to update"})
+         return res.status(500).json({error:"Failed to update"}) // Return to prevent further execution
     } catch (error) {
-        res.status(500).json({ error: "Internal server error" });
+        console.log(error)
+        res.status(500).json({error: "Internal server error"}) // Send error response
     }
 
 })
